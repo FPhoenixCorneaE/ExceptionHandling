@@ -1,0 +1,14 @@
+解决java.lang.NoSuchFieldError异常
+
+
+
+报异常：java.lang.NoSuchFieldError:包.R$id.xxx
+   
+
+原因就是主项目的xml文件和库项目中的xml文件 命名一样，导致库项目中的xml文件被主项目覆盖，
+所以库项目就找不到xml中的相关id，就报异常了
+
+解决方法：修改主项目中的xml文件命名，不要和库项目中的文件名称一样，防止文件冲突
+
+
+附带参考：http://www.hankcs.com/program/mobiledev/e-androidruntime-fatal-exception-main-java-lang-nosuchfielderror.html
