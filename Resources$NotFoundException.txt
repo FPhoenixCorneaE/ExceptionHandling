@@ -1,0 +1,69 @@
+
+	主要是因为引用了第三方jar包，第三方jar包获取资源方法如下：
+
+
+	private static final int[] b(Context context, String str) {
+        try {
+            for (Field field : Class.forName(context.getPackageName() + ".R$styleable").getFields()) {
+                if (field.getName().equals(str)) {
+                    return (int[]) field.get(null);
+                }
+            }
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
+        return null;
+    }
+	
+	
+	如果gradle文件中applicationId和AndroidManifest.xml文件中package的值是相同的，那么是没有问题的，但是因为包名是可以
+	随时修改的，所以在修改了包名的情况下，就会出现android.content.res.Resources$NotFoundException:Resource ID #0x0异常。
+	
+	
+	原因分析如下：
+	
+	因为library打成jar包，是以AndroidManifest.xml文件中package的值为包名为library中所有的Resource生成固定的资源ID，
+	而上述方法中context.getPackageName()获取的是gradle文件中配置的applicationId，如果不一致，就会找不到资源ID，出现异常。
+	
+	解决方法如下：
+	
+	1.用jadx-gui.bat脚本打开第三方jar包，找到上述获取资源方法所在的类，复制该类出来；
+	
+	2.在引入该第三方jar包之前，用好压软件打开，删除掉上述获取资源方法所在的类，方可引入；
+	
+	3.由于删除的类是在defpackage包下，所以直接在application的java包下新建与删除掉的类同
+	
+	名的类，除了获取资源的方法，其他的方法从上面用脚本复制出来的类里边复制粘贴过来，而
+	
+	获取资源的方法，方法名、参数相同，修改其方法体，如下：
+	
+	private static int[] b(Context context, String str) {
+        int[] attr = null;
+        try {
+            Resources resources = context.getResources();
+            if (TextUtils.isEmpty(c)) {
+                c = context.getPackageName();
+            }
+            if (str.equals("PtrFrameLayout")) {
+                attr = new int[8];
+                attr[0] = resources.getIdentifier("ptr_header", "attr", c);
+                attr[1] = resources.getIdentifier("ptr_content", "attr", c);
+                attr[2] = resources.getIdentifier("ptr_resistance", "attr", c);
+                attr[3] = resources.getIdentifier("ptr_ratio_of_header_height_to_refresh", "attr", c);
+                attr[4] = resources.getIdentifier("ptr_duration_to_close", "attr", c);
+                attr[5] = resources.getIdentifier("ptr_duration_to_close_header", "attr", c);
+                attr[6] = resources.getIdentifier("ptr_pull_to_fresh", "attr", c);
+                attr[7] = resources.getIdentifier("ptr_keep_header_when_refresh", "attr", c);
+            } else if (str.equals("PtrClassicHeader")) {
+                attr = new int[1];
+                attr[0] = resources.getIdentifier("ptr_rotate_ani_time", "attr", c);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return attr;
+    }
+	
+	
+
+	

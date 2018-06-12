@@ -1,0 +1,21 @@
+
+
+具体报错：com.google.gson.JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Use JsonReader.setLenient(true) to accept malformed JSON at line 1 column 7 path $
+
+
+
+解决方案：
+
+
+	Gson gson = new GsonBuilder()
+        .setLenient()
+        .create();
+
+    Retrofit retrofit = new Retrofit.Builder()
+        .baseUrl("http://whatever.com")
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build(); 
+		
+		
+		
+转载：https://stackoverflow.com/questions/27485346/malformedjsonexception-with-retrofit-api

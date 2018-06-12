@@ -1,0 +1,8 @@
+
+那些年使用GSon遇到的坑：
+
+1、当一个实体类的成员变量声明为Object时，GSon解析返回的其实是一个LinkedTreeMap；
+
+2、后台返回的int类型，在LinkedTreeMap中会被GSon强转为double类型；但在某些机型上是强转为String类型的，比如小米Note3；
+
+3、使用GSon解析后台返回的数据成实体类时，成员变量与返回的key值必须一致（包括大小写、字符），可以不声明所有的key，但必须一致，否则实体类为null；
